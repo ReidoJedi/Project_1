@@ -19,7 +19,7 @@ std::shared_ptr<User> Chat::getUserByLogin(const std::string& login) const
 
 std::shared_ptr<User> Chat::getUserByName(const std::string& name) const
 {
-	for (auto& user : users)
+	for (auto& user : users_)
 	{
 		if (name == user.GetUserName())
 			return std::make_shared<User>(user);
@@ -45,7 +45,7 @@ void Chat::login()
 
 		if (currentUser_ == nullptr || (password != currentUser_->getUserPassword()))
 		{
-			urrentUser_ = nullptr;
+			currentUser_ = nullptr;
 
 			std::cout << "Ошибка входа..." << std::endl;
 			std::cout << "Нажмите (0) чтобы выйти или другую кнопку чтобы повторить вход: ";
