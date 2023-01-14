@@ -82,7 +82,7 @@ void Chat::signUp()
 
 	User user = User(login, password, name);
 	users_.push_back(user);
-	currentUser_ = std::make_shared<User>([&]user);
+	currentUser_ = std::make_shared<User>(user);
 }
 
 void Chat::showChat() const
@@ -92,7 +92,7 @@ void Chat::showChat() const
 
 	std::cout << "- - - Чат - - -" << std::endl;
 
-	for (auto& mess : const messages : messages_)
+	for (auto& mess : messages_)
 	{
 		if (currentUser_->getUserLogin() == mess.getFrom() || currentUser_->getUserLogin() == mess.getTo() || mess.getTo() == "all")
 		{
@@ -189,7 +189,19 @@ void Chat::showUserMenu()
 	}
 }
 
-void Chat::showAllUsersName()
+void Chat::showAllUsersName() const
+{
+	std::cout << "- - - В чате - - -" << std::endl;
+	for (auto& user : users_)
+	{
+		std::cout << user.getUserName();
+
+		if (currentUser_->getUserLogin() == user.getUserLogin())
+			std::cout << "(me)";
+		std::cout << std::endl;
+	}
+	std::cout << "- - - - - - - - -" << std::endl;
+}
 
 void Chat::addMessage()
 {
@@ -199,7 +211,7 @@ void Chat::addMessage()
 	std::sin >> to;
 	std::cout << "Сообщение: ";
 	std::sin.ignore();
-	getline([&]std::cin, [&]text);
+	getline(std::cin, text);
 
 	if (!(to == "all" || getUserByName(to)))
 	{
@@ -208,8 +220,8 @@ void Chat::addMessage()
 	}
 
 	if (to == "all")
-		messages_.push_back(Message{ from currentUser_->getUserLogin(), to:"all", text });
+		messages_.push_back(Message{ currentUser_->getUserLogin(), "all", text });
 	else
-		messages_.push_back(Message{ from currentUser_->getUserLogin(), to:getUserByName(to)->getUserLogin(), text});
+		messages_.push_back(Message{ currentUser_->getUserLogin(), getUserByName(to)->getUserLogin(), text});
 
 }
