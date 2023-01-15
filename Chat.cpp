@@ -2,15 +2,15 @@
 #include "Chat.h"
 
 void Chat::start() {
-	isChatWork_ = true;
+	isChatWork_ = true; // Флаг для выхода из меню
 }
 
 std::shared_ptr<User> Chat::getUserByLogin(const std::string& login) const
 {
-	for (auto& user : users_)
+	for (auto& user : users_) // цикл проходит по всему массиву пользователей
 	{
-		if (login == user.getUserLogin())
-			return std::make_shared<User>(user);
+		if (login == user.getUserLogin()) // проверка совпадения логина
+			return std::make_shared<User>(user); /// возвращает указатель на текущего пользователя
 	}
 
 	return nullptr;
@@ -21,18 +21,18 @@ std::shared_ptr<User> Chat::getUserByName(const std::string& name) const
 {
 	for (auto& user : users_)
 	{
-		if (name == user.GetUserName())
-			return std::make_shared<User>(user);
+		if (name == user.getUserName())
+			return std::make_shared<User>(user); // возвращает указатель на текущего пользователя по имени
 	}
 
 	return nullptr;
 
 }
 
-void Chat::login()
+void Chat::login() // Авторизация в чат по уже созданному логину и паролю
 {
 	std::string login, password;
-	char operration;
+	char operation;
 
 	do
 	{
@@ -56,10 +56,10 @@ void Chat::login()
 
 		}
 
-	} while (!currentUser);
+	} while (!currentUser_);
 }
 
-void Chat::signUp()
+void Chat::signUp() // Регистрация пользователя в чате
 {
 	std::string login, password, name;
 
@@ -85,7 +85,7 @@ void Chat::signUp()
 	currentUser_ = std::make_shared<User>(user);
 }
 
-void Chat::showChat() const
+void Chat::showChat() const // показывает отправленные сообщения, конкретному пользователю или всем
 {
 	std::string from;
 	std::string to;
@@ -94,25 +94,30 @@ void Chat::showChat() const
 
 	for (auto& mess : messages_)
 	{
+		// Показывает сообщение: от текущего пользователя, для него и для всех
 		if (currentUser_->getUserLogin() == mess.getFrom() || currentUser_->getUserLogin() == mess.getTo() || mess.getTo() == "all")
 		{
-			from = (currentUser_->getUserLogin() == mess.getFrom()) ? "me" : getUserByLogin(mess.getTo())->getUserName();
+			from = (currentUser_->getUserLogin() == mess.getFrom()) ? "Я" : getUserByLogin(mess.getFrom())->getUserName();
 
 			if (mess.getTo() == "all")
 			{
-				to = "(all)"
+				to = "(Всем(all))";
 			}
 			else
 			{
-				to = (currentUser_->getUserLogin() == mess.getTo()) ? "me" : getUserByLogin(mess.getTo())->getUserName();
+				to = (currentUser_->getUserLogin() == mess.getTo()) ? "Я" : getUserByLogin(mess.getTo())->getUserName();
 			}
+
+			std::cout << "Сообщение от: " << from << " Кому: " << to << std::endl;
+			std::cout << "Текст: " << mess.getText() << std::endl;
+
 		}
 	}
 
 	std::cout << "- - - - - - - - - - - -" << std::endl;
 }
 
-void Chat::showLoginMenu()
+void Chat::showLoginMenu() // Отображение стартового меню программы - Меню верхнего уровня
 {
 	currentUser_ = nullptr;
 
@@ -122,37 +127,44 @@ void Chat::showLoginMenu()
 	{
 		std::cout << "\033[33m" << "(1)Вход" << std::endl;
 		std::cout << "(2)Регистрация" << std::endl;
+		std::cout << "(3)Разработчики" << std::endl;
 		std::cout << "(0)Выход" << std::endl;
 		std::cout << "\033[36m" << ">> " << "\033[0m";
+		std::cin >> operation;
 
 		switch (operation)
 		{
 		case '1':
-				login();
-				break;
+			login();
+			break;
 		case '2':
-				try
-				{
-					signUp();
-				}
-				catch (const std::exception& e)
-				{
-					std::cout << e.what() << std::endl;
-				}
-				break;
-
+			try
+			{
+				signUp();
+			}
+			catch (const std::exception& e)
+			{
+				std::cout << e.what() << std::endl;
+			}
+			break;
+		case '3':
+			std::cout << "Над проектом работали:" << endl;
+			std::cout << "1. Дмитрий Воробьев - тимлид, работа над блоками Main.cpp и Chat.h" << endl;
+			std::cout << "2. Илья Кривцов - Работа над блоками User.h и Message.h." << endl;
+			std::cout << "3. Reido Aya - Работа над блоком Chat.cpp." << endl;
+			break;
 		case '0':
 			isChatWork_ = false;
 			break;
 		default:
 			std::cout << "1 или 2 ..." << std::endl;
 			break;
-					
+
 		}
 	} while (!currentUser_ && isChatWork_);
 }
 
-void Chat::showUserMenu()
+void Chat::showUserMenu() // отображает внутреннее меню чата, после авторизации пользователя
 {
 	char operation;
 
@@ -160,7 +172,7 @@ void Chat::showUserMenu()
 
 	while (currentUser_)
 	{
-		std::cout << "(1)Показать чат | (2)Отправить сообщение | (3)Показать кто в чате | (4)Выйти ";
+		std::cout << "(1)Показать чат | (2)Отправить сообщение | (3)Показать кто в чате | (0)Выйти ";
 
 		std::cout << std::endl
 			<< ">> ";
@@ -189,7 +201,7 @@ void Chat::showUserMenu()
 	}
 }
 
-void Chat::showAllUsersName() const
+void Chat::showAllUsersName() const //Показать имена пользователей в чате
 {
 	std::cout << "- - - В чате - - -" << std::endl;
 	for (auto& user : users_)
@@ -197,31 +209,31 @@ void Chat::showAllUsersName() const
 		std::cout << user.getUserName();
 
 		if (currentUser_->getUserLogin() == user.getUserLogin())
-			std::cout << "(me)";
+			std::cout << "(Я)";
 		std::cout << std::endl;
 	}
 	std::cout << "- - - - - - - - -" << std::endl;
 }
 
-void Chat::addMessage()
+void Chat::addMessage() // Формирование сообщения
 {
 	std::string to, text;
 
-	std::cout << "Кому (пользователю или всем): ";
-	std::sin >> to;
+	std::cout << "Кому (пользователю или всем(команда all)): ";
+	std::cin >> to;
 	std::cout << "Сообщение: ";
-	std::sin.ignore();
-	getline(std::cin, text);
+	std::cin.ignore(); // игнорировать любые введенные посторонние символы
+	getline(std::cin, text); // ввод текстового сообщения с пробелами
 
-	if (!(to == "all" || getUserByName(to)))
+	if (!(to == "all" || getUserByName(to))) // если не удалось найти получателя по имени
 	{
-		std::cout << "Такой пользователь не найден" << to << std::endl;
+		std::cout << "Такой пользователь не найден " << to << std::endl;
 		return;
 	}
 
 	if (to == "all")
 		messages_.push_back(Message{ currentUser_->getUserLogin(), "all", text });
 	else
-		messages_.push_back(Message{ currentUser_->getUserLogin(), getUserByName(to)->getUserLogin(), text});
+		messages_.push_back(Message{ currentUser_->getUserLogin(), getUserByName(to)->getUserLogin(), text });
 
 }
